@@ -1,0 +1,81 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" docType="html-5.0" applyBodyTag="false">
+	<head>
+		<meta charset="utf-8" />
+		<title>AngularJS • RemoteObjects • TodoMVC</title>
+		<apex:stylesheet value="{!URLFOR($Resource.static, 'css/todomvc-common/base.css')}" />
+		<style>[ng-cloak] { display: none; }</style>
+	</head>
+	<body ng-app="todomvc">
+		<ng-view />
+
+		<script type="text/ng-template" id="todomvc-index.html">
+			<section id="todoapp" ng-controller="TodoCtrl">
+				<header id="header">
+					<div class="message" ng-show="showMessage">{{message}}</div>
+					<h1>todos</h1>
+					<form id="todo-form" ng-submit="addTodo()">
+						<input id="new-todo" placeholder="What needs to be done?" ng-model="newTodo" autofocus>
+					</form>
+				</header>
+				<section id="main" ng-show="todos.length" ng-cloak>
+					<input id="toggle-all" type="checkbox" ng-model="allChecked" ng-click="markAll(allChecked)" ng-hide="true">
+					<label for="toggle-all">Mark all as complete</label>
+					<ul id="todo-list">
+						<li ng-repeat="todo in todos | filter:statusFilter track by $index" ng-class="{completed: todo.completed, editing: todo == editedTodo}">
+							<div class="view">
+								<input class="toggle" type="checkbox" ng-checked="todo.completed" ng-click="toggleTodo($event, todo.Id)">
+								<label ng-dblclick="editTodo(todo)">{{todo.title}}</label>
+								<button class="destroy" ng-click="removeTodo(todo)"></button>
+							</div>
+							<form ng-submit="doneEditing(todo)">
+								<input class="edit" ng-trim="false" ng-model="todo.title" todo-escape="revertEditing(todo)" ng-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+							</form>
+						</li>
+					</ul>
+				</section>
+				<footer id="footer" ng-show="todos.length" ng-cloak>
+					<span id="todo-count"><strong>{{remainingCount}}</strong>
+						<ng-pluralize count="remainingCount" when="{ one: 'item left', other: 'items left' }"></ng-pluralize>
+					</span>
+					<ul id="filters">
+						<li>
+							<a ng-class="{selected: status == ''} " href="#/">All</a>
+						</li>
+						<li>
+							<a ng-class="{selected: status == 'active'}" href="#/active">Active</a>
+						</li>
+						<li>
+							<a ng-class="{selected: status == 'completed'}" href="#/completed">Completed</a>
+						</li>
+					</ul>
+					<button id="clear-completed" ng-click="clearCompletedTodos()" ng-show="completedCount">Clear completed ({{completedCount}})</button>
+				</footer>
+			</section>
+			<footer id="info">
+				<p>Double-click to edit a todo</p>
+				<p>Credits:
+					<a href="http://twitter.com/cburgdorf">Christoph Burgdorf</a>,
+					<a href="http://ericbidelman.com">Eric Bidelman</a>,
+					<a href="http://jacobmumm.com">Jacob Mumm</a> and
+					<a href="http://igorminar.com">Igor Minar</a>
+				</p>
+				<p>Based on <a href="http://todomvc.com">TodoMVC</a></p>
+				<p>Ported to <a href="https://www.salesforce.com">Force.com Platform</a> by <a href="http://dodla.com">Varun Dodla</a></p>				
+			</footer>
+		</script>
+		<apex:remoteObjects jsNamespace="$RO">
+			<apex:remoteObjectModel name="Todo__c" jsShorthand="Todo">
+				<apex:remoteObjectField name="title__c" jsShorthand="title" />
+				<apex:remoteObjectField name="completed__c" jsShorthand="completed" />
+			</apex:remoteObjectModel>
+		</apex:remoteObjects>
+		<apex:includeScript value="{!URLFOR($Resource.static, 'js/todomvc-common/base.js')}"/>
+		<apex:includeScript value="{!URLFOR($Resource.static, 'js/angular/angular.js')}"/>
+		<apex:includeScript value="{!URLFOR($Resource.static, 'js/angular-route/angular-route.js')}"/>
+		<apex:includeScript value="{!URLFOR($Resource.static, 'js/app.js')}"/>
+		<apex:includeScript value="{!URLFOR($Resource.static, 'js/controllers/todoCtrl.js')}"/>
+		<apex:includeScript value="{!URLFOR($Resource.static, 'js/services/todoStorageSfdc.js')}"/>		
+		<apex:includeScript value="{!URLFOR($Resource.static, 'js/directives/todoFocus.js')}"/>		
+		<apex:includeScript value="{!URLFOR($Resource.static, 'js/directives/todoEscape.js')}"/>		
+	</body>	
+</apex:page>
